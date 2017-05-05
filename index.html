@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -208,14 +209,15 @@
 
     </style>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  </head>
-  <body>
+</head>
+
+<body>
     <h1>Hello, world!</h1>
     <div class="chat_window">
         <div class="top_menu">
@@ -227,7 +229,7 @@
                 <div class="button maximize">
                 </div>
             </div>
-        <div class="title">Chat</div>
+            <div class="title">Chat</div>
         </div>
         <ul class="messages">
         </ul>
@@ -242,7 +244,8 @@
         </div>
     </div>
     <div class="message_template">
-        <li class="message"><div class="avatar"></div>
+        <li class="message">
+            <div class="avatar"></div>
             <div class="text_wrapper">
                 <div class="text"></div>
             </div>
@@ -252,20 +255,59 @@
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.js"></script>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
+
+
+            var Message;
+            Message = function (arg) {
+                this.text = arg.text, this.message_side = arg.message_side;
+                this.draw = function (_this) {
+                    return function () {
+                        var $message;
+                        $message = $($('.message_template').clone().html());
+                        $message.addClass(_this.message_side).find('.text').html(_this.text);
+                        $('.messages').append($message);
+                        return setTimeout(function () {
+                            return $message.addClass('appeared');
+                        }, 0);
+                    };
+                } (this);
+                return this;
+            };
+
             var socket = io.connect("http://localhost:3000");
-            socket.on("connect",function(data){
+            socket.on("connect", function (data) {
                 var user = prompt("Digite Usuario: ");
                 socket.emit('join', user);
             });
-            $(".send_message").click(function(){
-                var message = $(".message_input").val();
-                socket.emit("messages",message);
+
+            socket.on("sendMessage", function (message1, user) {
+                message = new Message({
+                    text: message1,
+                    message_side: 'right'
+                });
+
+                message.draw();
+            });
+
+            $(".send_message").click(function () {
+                var message1 = $(".message_input").val();
+                socket.emit("messages", message1);
+
+                message = new Message({
+                    text: message1,
+                    message_side: 'left'
+                });
+
+                message.draw();
             });
         });
+
     </script>
-  </body>
+</body>
+
 </html>
